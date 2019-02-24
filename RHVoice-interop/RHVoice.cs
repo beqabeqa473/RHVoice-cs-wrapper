@@ -1,14 +1,13 @@
-﻿using NAudio.Utils;
-using NAudio.Wave;
-using System;
+﻿using System;
 using System.IO;
+using System.Media;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace RHVoice_interop
 {
-    public class RHVoice
+    public class RHVoice: IDisposable
     {
         MemoryStream stream;
         private IntPtr engine;
@@ -90,26 +89,50 @@ namespace RHVoice_interop
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Stream Speak(SynthParams p)
+        public void Speak(string msg, SynthParams p, bool toFile = false)
         {
-            var text = Encoding.UTF8.GetBytes("Конвенция о правах инвалидов (ратифицирована федеральным законом РФ от 03.05.2012 N 46-ФЗ).");
+            const int headerSize = 44;
+            const int formatChunkSize = 16;
+            const short waveAudioFormat = 1;
+            const short numChannels = 1;
+            const int sampleRate = 16000;
+            const short bitsPerSample = 16;
+            const int byteRate = (numChannels * bitsPerSample * sampleRate) / 8;
+            const short blockAlign = numChannels * bitsPerSample / 8;
+            var text = Encoding.UTF8.GetBytes(msg);
             var message = NativeMethods.RHVoice_new_message(engine, text, (uint)text.Length, MessageType.Text, p, IntPtr.Zero);
             using (stream = new MemoryStream())
-            {
+                {
                 NativeMethods.RHVoice_speak(message);
                 NativeMethods.RHVoice_delete_message(message);
-                stream.Position = 0;
-                var sampleRate = 16000;
-                var waveFormat = WaveFormat.CreateCustomFormat(WaveFormatEncoding.Pcm, sampleRate, 1, sampleRate * 2, 2, 16);
-                using (var reader = new RawSourceWaveStream(stream, waveFormat))
+                var sizeInBytes = (int)stream.Length;
+                using (var writer = new MemoryStream())
                 {
-                    var waveMemoryStream = new MemoryStream(stream.Capacity);
-                    using (var writer = new WaveFileWriter(new IgnoreDisposeStream(waveMemoryStream), waveFormat))
+                    writer.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
+                    writer.Write(BitConverter.GetBytes(sizeInBytes + headerSize - 8), 0, 4);
+                    writer.Write(Encoding.ASCII.GetBytes("WAVEfmt "), 0, 8);
+                    writer.Write(BitConverter.GetBytes(formatChunkSize), 0, 4);
+                    writer.Write(BitConverter.GetBytes(waveAudioFormat), 0, 2);
+                    writer.Write(BitConverter.GetBytes(numChannels), 0, 2);
+                    writer.Write(BitConverter.GetBytes(sampleRate), 0, 4);
+                    writer.Write(BitConverter.GetBytes(byteRate), 0, 4);
+                    writer.Write(BitConverter.GetBytes(blockAlign), 0, 2);
+                    writer.Write(BitConverter.GetBytes(bitsPerSample), 0, 2);
+                    writer.Write(Encoding.ASCII.GetBytes("data"), 0, 4);
+                    writer.Write(BitConverter.GetBytes(sizeInBytes), 0, 4);
+                    stream.Position = 0;
+                   stream.CopyTo(writer);
+                    var player = new SoundPlayer(writer);
+                    writer.Position = 0;
+                    player.Play();
+                    if (toFile)
                     {
-                        reader.CopyTo(writer);
+                        using (var file = File.Create("file.wav"))
+                        {
+                            writer.Position = 0;
+                            writer.CopyTo(file);
+                        }
                     }
-                    waveMemoryStream.Position = 0;
-                    return waveMemoryStream;
                 }
             }
         }

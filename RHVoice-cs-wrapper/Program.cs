@@ -1,12 +1,5 @@
-﻿using NAudio.Utils;
-using NAudio.Wave;
-using RHVoice_interop;
+﻿using RHVoice_interop;
 using System;
-using System.IO;
-using System.Media;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace RHVoice_cs_wrapper
 {
@@ -15,8 +8,9 @@ namespace RHVoice_cs_wrapper
 
         static void Main(string[] args)
         {
-            var rhvoice = new RHVoice();
-            Console.WriteLine($"RHVoice version: {rhvoice.GetVersion()}");
+            using (var rhvoice = new RHVoice())
+            {
+                Console.WriteLine($"RHVoice version: {rhvoice.GetVersion()}");
             Console.WriteLine($"Voices available: {rhvoice.GetVoiceCount()}");
             var voices = rhvoice.GetVoices();
             foreach (var voice in voices)
@@ -25,7 +19,7 @@ namespace RHVoice_cs_wrapper
                 Console.WriteLine(voice.Name);
                 Console.WriteLine(voice.Gender);
             }
-                Console.WriteLine($"Profiles available: {rhvoice.GetVoiceProfilesCount()}");
+            Console.WriteLine($"Profiles available: {rhvoice.GetVoiceProfilesCount()}");
             var profiles = rhvoice.GetVoiceProfiles();
             foreach (var profile in profiles)
             {
@@ -34,11 +28,13 @@ namespace RHVoice_cs_wrapper
             var p = new SynthParams();
             p.VoiceProfile = "Aleksandr";
             p.RelativeRate = 3.0;
-            using (var waveFile = File.Create("test.wav"))
-            using (var spokenAudio = rhvoice.Speak(p))
-                spokenAudio.CopyTo(waveFile);
+            string msg;
+            while ((msg = Console.ReadLine()) != "exit")
+            {
+                rhvoice.Speak(msg, p, false);
+            }
         }
-
+    }
 
     }
 }
