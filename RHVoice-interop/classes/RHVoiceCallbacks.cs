@@ -7,6 +7,9 @@ namespace RHVoice_interop
     public class RHVoiceCallbacks
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate int SetSampleRate(int sample_rate);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int PlaySpeech(IntPtr samples, int count, IntPtr user_data);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -27,6 +30,7 @@ namespace RHVoice_interop
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int PlayAudio([MarshalAs(UnmanagedType.LPStr)] string src, IntPtr user_data);
 
+        public SetSampleRate OnSetSampleRate;
         public PlaySpeech OnPlaySpeech;
         public ProcessMark OnProcessMark;
         public WordStarts OnWordStarts;

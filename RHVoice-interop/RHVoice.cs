@@ -11,18 +11,28 @@ namespace RHVoice_interop
     {
         MemoryStream stream;
         private IntPtr engine;
+        private int sampleRate;
         private RHVoiceCallbacks.PlaySpeech playSpeechCallbackDelegate;
+        private RHVoiceCallbacks.SetSampleRate setSampleRateCallbackDelegate;
 
         public RHVoice()
         {
             var config = new RHVoiceInitParams();
             config.Callbacks = new RHVoiceCallbacks();
+            setSampleRateCallbackDelegate = setSampleRate;
             playSpeechCallbackDelegate = playSpeech;
+            config.Callbacks.OnSetSampleRate = setSampleRateCallbackDelegate;
             config.Callbacks.OnPlaySpeech = playSpeechCallbackDelegate;
             engine = NativeMethods.RHVoice_new_tts_engine(config);
             if (engine == IntPtr.Zero)
                 throw new Exception("RHVoice initialization error");
 		}
+
+        private   int setSampleRate(int sampleRate)
+        {
+            this.sampleRate = sampleRate;
+            return 1;
+        }
 
         private   int playSpeech(IntPtr dataPtr, int count, IntPtr user_data)
         {
@@ -95,9 +105,8 @@ namespace RHVoice_interop
             const int formatChunkSize = 16;
             const short waveAudioFormat = 1;
             const short numChannels = 1;
-            const int sampleRate = 16000;
             const short bitsPerSample = 16;
-            const int byteRate = (numChannels * bitsPerSample * sampleRate) / 8;
+            int byteRate = (numChannels * bitsPerSample * sampleRate) / 8;
             const short blockAlign = numChannels * bitsPerSample / 8;
             var text = Encoding.UTF8.GetBytes(msg);
             var message = NativeMethods.RHVoice_new_message(engine, text, (uint)text.Length, MessageType.Text, p, IntPtr.Zero);

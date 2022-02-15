@@ -26,7 +26,7 @@ namespace RHVoice_cs_wrapper
                 Console.WriteLine(profile);
             }
             var p = new SynthParams();
-            p.VoiceProfile = "Aleksandr";
+            p.VoiceProfile = "Anna";
             p.RelativeRate = 3.0;
             string msg;
             while ((msg = Console.ReadLine()) != "exit")
