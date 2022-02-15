@@ -10,11 +10,9 @@ public static class NativeMethods
         var is64 = IntPtr.Size == 8;
         var subfolder = is64 ? "\\lib\\x64\\" : "\\lib\\x86\\";
 
-        LoadLibrary(myFolder + subfolder + "RHVoice.dll");
+        NativeLibrary.Load(myFolder + subfolder + "RHVoice.dll");
     }
 
-    [DllImport("kernel32.dll")]
-    private static extern IntPtr LoadLibrary(string dllToLoad);
     [DllImport("RHVoice.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr RHVoice_get_version();
     [DllImport("RHVoice.dll", CallingConvention = CallingConvention.Cdecl)]
