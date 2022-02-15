@@ -1,12 +1,10 @@
-﻿namespace RHVoice_interop
-{
-    public enum CapitalsMode
-    {
-        Default,
-        Off,
-        Word,
-        Pitch,
-        Sound
-    }
+﻿namespace RHVoice_interop;
 
+public enum CapitalsMode
+{
+    Default,
+    Off,
+    Word,
+    Pitch,
+    Sound
 }

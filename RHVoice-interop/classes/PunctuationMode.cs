@@ -1,11 +1,9 @@
-﻿namespace RHVoice_interop
-{
-    public enum PunctuationMode
-    {
-        Default,
-        None,
-        All,
-        Some
-    }
+﻿namespace RHVoice_interop;
 
+public enum PunctuationMode
+{
+    Default,
+    None,
+    All,
+    Some
 }
