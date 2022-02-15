@@ -18,6 +18,7 @@ namespace RHVoice_cs_wrapper
                 Console.WriteLine(voice.Language);
                 Console.WriteLine(voice.Name);
                 Console.WriteLine(voice.Gender);
+                Console.WriteLine(voice.Country);
             }
             Console.WriteLine($"Profiles available: {rhvoice.GetVoiceProfilesCount()}");
             var profiles = rhvoice.GetVoiceProfiles();

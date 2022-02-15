@@ -30,6 +30,9 @@ namespace RHVoice_interop
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate int PlayAudio([MarshalAs(UnmanagedType.LPStr)] string src, IntPtr user_data);
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate IntPtr Done(IntPtr user_data);
+
         public SetSampleRate OnSetSampleRate;
         public PlaySpeech OnPlaySpeech;
         public ProcessMark OnProcessMark;
@@ -38,6 +41,7 @@ namespace RHVoice_interop
         public SentenceStarts OnSentenceStarts;
         public SentenceEnds OnSentenceEnds;
         public PlayAudio OnPlayAudio;
+        public Done OnDone;
     }
 
 }

@@ -8,5 +8,6 @@ namespace RHVoice_interop
         public string Language;
         public string Name;
         public Gender Gender;
+        public string Country;
     }
 }
