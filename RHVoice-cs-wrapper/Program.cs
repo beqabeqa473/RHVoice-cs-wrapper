@@ -19,12 +19,11 @@ class Program
             Console.WriteLine(voice.Country);
         }
         Console.WriteLine($"Profiles available: {rhvoice.GetVoiceProfilesCount()}");
-        // Listing of profiles currently don't work.
-        //var profiles = rhvoice.GetVoiceProfiles();
-        //foreach (var profile in profiles)
-        //{
-        //Console.WriteLine(profile);
-        //}
+        var profiles = rhvoice.GetVoiceProfiles();
+        foreach (var profile in profiles)
+        {
+        Console.WriteLine(profile);
+        }
         var p = new SynthParams
         {
             VoiceProfile = "Anna",

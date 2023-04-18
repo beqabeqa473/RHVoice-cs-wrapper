@@ -82,15 +82,17 @@ public class RHVoice : IDisposable
         var count = NativeMethods.RHVoice_get_number_of_voice_profiles(engine);
         if (count == 0)
             return new string[0];
+        int itemSize = Marshal.SizeOf(typeof(IntPtr));
         var nativeVoiceProfiles = NativeMethods.RHVoice_get_voice_profiles(engine);
         if (nativeVoiceProfiles == IntPtr.Zero)
             throw new Exception("Cannot get voice profiles");
 
         var profiles = new string[count];
-        for (int i = 0; i < count; i++, nativeVoiceProfiles += sizeof(int) * i)
-            {
+        for (int i = 0; i < count; i++)
+        {
             var profile = Marshal.PtrToStringAnsi((IntPtr)Marshal.PtrToStructure(nativeVoiceProfiles, typeof(IntPtr)));
             profiles[i] = profile;
+            nativeVoiceProfiles += itemSize;
         }
         return profiles;
     }
